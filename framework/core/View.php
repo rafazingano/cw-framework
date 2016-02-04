@@ -7,9 +7,9 @@ class CW_View {
     private $extensions     = array('.php', '.html'); /*Extenções que ira buscar para montar views e themes*/
     private $view           = null; /*view selecionada*/
     private $blockView      = null; /*bloco a ser utilizado da view*/
-	private $rootView		= null; /*local root das views*/
+    private $rootView		= null; /*local root das views*/
     //private $theme        = null; /*thema selecionado*/
-	private $defaultTheme 	= null; /*Theme selecionado*/
+    private $defaultTheme 	= null; /*Theme selecionado*/
     private $blockTheme     = null; /*bloco a ser utilizado do theme*/
     private $viewTheme      = null; /*bloco no theme onde sera montado a view*/
     private $indexTheme     = null; /*arquivo index do theme*/

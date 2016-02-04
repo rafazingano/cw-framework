@@ -12,7 +12,7 @@ class CW_Config{
     protected $urlRefactoring     = null; 
     protected $indexViews         = null;
     protected $localControllers   = null;
-	protected $blockViews		  = null;
+    protected $blockViews         = null;
 
     protected $inner = array(
         'title'         => 'My CW Framework',
@@ -120,8 +120,8 @@ class CW_Config{
      * Metodos das views
      */
     public function setRootViews($v = null) {
-        $this->rootViews = CW_util::documentRoot() . '/';
-        $this->rootViews .= isset($this->localRoot)? $this->localRoot .  '/' : ''; 
+        $this->rootViews = CW_util::documentRoot();
+        //$this->rootViews .= isset($this->localRoot)? $this->localRoot .  '/' : ''; 
         $this->rootViews .= isset($v)? $v . '/' : '';
     }
 	public function getRootViews() {
@@ -143,8 +143,8 @@ class CW_Config{
     }
         
     public function setServerViews($v = null) {
-        $this->serverViews = CW_util::serverName(true) . '/' 
-            . isset($this->localRoot)? $this->localRoot .  '/' : '' 
+        $this->serverViews = CW_util::serverName(true) 
+            //. isset($this->localRoot)? $this->localRoot .  '/' : '' 
             . isset($v)? $v . '/' : '';
     }    
     /*
@@ -157,18 +157,16 @@ class CW_Config{
         return $this->defaultThemes;
     }    
     public function setRootThemes($t = null) {
-        $this->rootThemes = CW_util::documentRoot() . '/';
-        $this->rootThemes .= isset($this->localRoot)? $this->localRoot .  '/' : '';
+        $this->rootThemes = CW_util::documentRoot();
         $this->rootThemes .= isset($t)? $t . '/' : '';
     }    
     public function getRootThemes(){
         return $this->rootThemes;
     }    
     public function setServerThemes($t = null) {
-        $root       = CW_util::serverName(true) . '/';
-        $local_root = isset($this->localRoot)? $this->localRoot .  '/' : '';
+        $root       = CW_util::serverName(true);
         $server_theme = isset($t)? $t . '/' : '';
-        $this->serverThemes = $root . $local_root . $server_theme;
+        $this->serverThemes = $root . $server_theme;
     }
     public function getServerThemes() {
         return $this->serverThemes;

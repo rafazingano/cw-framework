@@ -3,8 +3,8 @@
 class CW_Request {
 	private $SCRIPT_NAME 	= null;
 	private $controller 	= null;
-	private $action			= null;
-	private $params 		= null;
+	private $action		= null;
+	private $params         = null;
 	
 	public function __construct() {
 		$this->SCRIPT_NAME 	= $_SERVER['SCRIPT_NAME'];

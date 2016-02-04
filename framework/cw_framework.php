@@ -10,29 +10,26 @@ require_once 'framework/core/Model.php';
 require_once 'framework/core/View.php';
 require_once 'framework/core/DB.php';
 require_once 'framework/core/Util.php';
+require_once 'framework/core/Routes.php';
+require_once 'config/routes.php';
 /* Library */
 require_once 'framework/library/simple_html_dom.php';
 
-$controller       = CW_Request::get('controller');
-$view             = CW_Request::get('view');
+$routes = new Routes();
+$routes->setController(CW_Request::get('controller'));
+$routes->setAction(CW_Request::get('action'));
+$routes->route();
+$controller = $routes->getController();
+$action     = $routes->getAction();
 
-if ($controller == null){ $controller = "index"; }
-$controller .= 'Controller';
-
-if (file_exists("controllers/{$controller}.php")) {
-    require_once "controllers/{$controller}.php";
+if (file_exists("controllers/" . $controller . ".php")) {
+    require_once "controllers/" . $controller . ".php";
+    $Controller = new $controller();
+    if (method_exists($Controller, $action)) {
+        $Controller->$action();
+    } else {
+        die('Page not found!');
+    }
 } else {
-    die("O Controller <strong>{$controller}</strong> não existe na pasta Controller do MVC");
-}
-
-$Controller = new $controller();
-
-if ($view == null) {
-    $view = 'index';
-}
-
-if (method_exists($Controller, $view)) {
-    $Controller->$view();
-} else {
-    die('Page not found!');
+    die("O Controller <strong>" . $controller . "</strong> não existe na pasta Controller do MVC");
 }
