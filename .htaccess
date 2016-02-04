@@ -1,0 +1,32 @@
+<Files *.html>
+SetOutputFilter DEFLATE
+</Files>
+
+<Files *.css>
+SetOutputFilter DEFLATE
+</Files>
+
+<Files *.xml>
+SetOutputFilter DEFLATE
+</Files>
+
+<Files *.js>
+SetOutputFilter DEFLATE
+</Files>
+
+Options +FollowSymLinks
+RewriteEngine On
+
+RewriteRule ^$ index.php
+
+RewriteRule ^([a-zA-Z0-9-]+).html$ index.php?controller=$1&%{QUERY_STRING}
+RewriteRule ^([a-zA-Z0-9-]+)/$ index.php?controller=$1&%{QUERY_STRING}
+RewriteRule ^([a-zA-Z0-9-]+)$ index.php?controller=$1&%{QUERY_STRING}
+
+RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+).html$ index.php?controller=$1&view=$2&%{QUERY_STRING}
+RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/$ index.php?controller=$1&view=$2&%{QUERY_STRING}
+RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)$ index.php?controller=$1&view=$2&%{QUERY_STRING}
+
+ErrorDocument 403 /index.php?controller=403
+ErrorDocument 404 /index.php?controller=404
+ErrorDocument 500 /index.php?controller=500
