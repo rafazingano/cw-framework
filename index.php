@@ -1,5 +1,4 @@
 <?php
-require_once 'framework/cw_framework.php';
 
 define('ENVIRONMENT', 'development');
 define('VERSION', '0.1');
@@ -17,3 +16,5 @@ if (defined('ENVIRONMENT')) {
             exit('The application environment is not set correctly.');
     }
 }
+
+require_once 'framework/cw_framework.php';

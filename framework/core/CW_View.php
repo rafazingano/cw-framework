@@ -20,6 +20,16 @@ class CW_View {
         $this->structure = new CW_Structure();
     }
     
+    function file_get_html($url, $use_include_path = false, $context=null, $offset = -1, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = 'UTF-8', $stripRN=true, $defaultBRText="\r\n", $defaultSpanText=" ") {
+        $dom = new simple_html_dom(null, $lowercase, $forceTagsClosed, $target_charset, $stripRN, $defaultBRText, $defaultSpanText);
+        $contents = file_get_contents($url, $use_include_path, $context, $offset);
+        if (empty($contents) || strlen($contents) > MAX_FILE_SIZE){
+            return false;
+        }
+        $dom->load($contents, $lowercase, $stripRN);
+        return $dom;
+    }
+    
     function getHtml() {
         return $this->html;
     }
@@ -220,14 +230,14 @@ class CW_View {
     private function html($_view = null){
         $url_view = $this->urlViewRoot(is_array($_view)? $_view['view'] : $_view);
         if($url_view){ 
-            $htmlView = file_get_html($url_view);
+            $htmlView = $this->file_get_html($url_view);
             if($this->getBlockView()){
                 $htmlView->find($this->getBlockView(), 0);
             }
         }
         $url_theme = $this->urlThemeRoot($this->getTheme(), $this->getIndexTheme());
         if($url_theme){
-            $this->html = file_get_html($url_theme);
+            $this->html = $this->file_get_html($url_theme);
             if($this->getBlockTheme()){
                 $this->html->find($this->getBlockTheme(), 0);
             }
