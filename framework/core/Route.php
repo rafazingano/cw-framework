@@ -1,12 +1,12 @@
 <?php
 
-class CW_Routes {
+class CW_Route {
     public $routes   = array();
     private $controller = "index";
     private $action     = "index";
     
     public function __construct() { 
-        
+        $this->routes = require 'config/route.php';
     }
     
     function getController() {

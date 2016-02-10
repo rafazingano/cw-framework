@@ -3,6 +3,7 @@
 class IndexController extends CW_Controller {
 
     public function index() {
+
         
 //        $this->view->setInnerText('title', 'My CW Framework Funciona');
 //        $this->view->setInnerText('a[class="navbar-brand"]', 'CW Framework');  

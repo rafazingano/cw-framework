@@ -1,38 +1,33 @@
 <?php
 
-class CW_DB {
-    private $db         = null;
-    private $query      = null;
-    private $select     = null;
-    private $from       = null;
+class CW_DataBase {
+    protected $db      = null;
+    private $query     = null;
+    private $select    = null;
+    private $from      = null;
     private $join      = null;
-    private $limit      = null;
-    private $where      = null;
-    private $return     = null;
-    private $config_db  = 'default';
+    private $limit     = null;
+    private $where     = null;
+    private $return    = null;
+    
+    private static $databases;
+    private $connection;
 
-    public function __construct() {
-        
-    }
-
-    public function set_config($c_db = 'default') {
-        $this->config_db = $c_db;
-        return $this;
-    }
-
-    public function create() {
-        if (CW_config::$db[$this->config_db]['driver'] == 'mysqli') {
-            $mysqli = new mysqli(
-                    Config::$db[$this->config_db]['server'], 
-                    Config::$db[$this->config_db]['user'], 
-                    Config::$db[$this->config_db]['pass'], 
-                    Config::$db[$this->config_db]['db']
-            );
-            if (CW_config::$db[$this->config_db]['charset'] != '') {
-                $mysqli->set_charset(CW_config::$db[$this->config_db]['charset']);
-            }
-            return $mysqli;
+    public function __construct($connDetails = 'default'){
+        if(!is_object(self::$databases[$connDetails])){            
+            if (!$settings = require $file){ throw new exception('Unable to open ' . $file . '.'); }        
+            $dns = $settings['driver'] . ':host=' . $settings['host'] . ((!empty($settings['port'])) ? (';port=' . $settings['port']) : '') . ';dbname=' . $settings['dbname'];
+            self::$databases[$connDetails] = new PDO($dns, $settings['username'], $settings['password']);
         }
+        $this->connection = self::$databases[$connDetails];
+    }
+    
+    public function fetchAll($sql){
+        $args = func_get_args();
+        array_shift($args);
+        $statement = $this->connection->prepare($sql);        
+        $statement->execute($args);
+         return $statement->fetchAll(PDO::FETCH_OBJ);
     }
 
     public function select($s = '*') {

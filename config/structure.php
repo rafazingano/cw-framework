@@ -1,0 +1,21 @@
+<?php
+
+return [
+    'controller' => [
+        'local' => 'controllers', /*Diretório das controllers*/
+        'index' => 'index',	  /*arquivo default controller*/
+    ],
+    'view' => [
+        'local' => 'views',         /*Diretório das views*/
+        'index' => 'default/index', /*arquivo default view*/
+        'block' => null,            /*Caso não vá usar todo o views busca-se o bloco a ser utilizado.*/
+    ],
+    'theme' => [
+        'local'   => 'themes',            /*Diretório onde ficaram o(s) theme(s)*/
+        'default' => 'default',           /*Theme padrão quando nenhum for setado na controller*/
+        'index'   => 'index',             /*Arquivo index do theme, pode acontecer de ter mais arquivos no diretorio do theme e ou ser alterado o index do theme*/
+        'view'    => 'div[class="view"]', /*Bloco onde vai ser inserido a view*/
+        'block'   => null                 /*Caso não vá usar todo o theme busca-se o bloco a ser utilizado.*/
+    ]
+];
+

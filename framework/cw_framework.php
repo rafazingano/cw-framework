@@ -1,21 +1,18 @@
 <?php
-
 /*Busca o config default do sistema*/
 require_once 'framework/core/Config.php';
-/*Busca o config do sistema*/
-require_once 'config/config.php';
 require_once 'framework/core/Request.php';
 require_once 'framework/core/Controller.php';
 require_once 'framework/core/Model.php';
 require_once 'framework/core/View.php';
-require_once 'framework/core/DB.php';
+require_once 'framework/core/DataBase.php';
 require_once 'framework/core/Util.php';
-require_once 'framework/core/Routes.php';
-require_once 'config/routes.php';
+require_once 'framework/core/Route.php';
+require_once 'framework/core/Structure.php';
 /* Library */
 require_once 'framework/library/simple_html_dom.php';
 
-$routes = new Routes();
+$routes = new CW_Route();
 $routes->setController(CW_Request::get('controller'));
 $routes->setAction(CW_Request::get('action'));
 $routes->route();

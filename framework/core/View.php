@@ -7,59 +7,54 @@ class CW_View {
     private $extensions     = array('.php', '.html'); /*Extenções que ira buscar para montar views e themes*/
     private $view           = null; /*view selecionada*/
     private $blockView      = null; /*bloco a ser utilizado da view*/
-    private $rootView		= null; /*local root das views*/
-    //private $theme        = null; /*thema selecionado*/
-    private $defaultTheme 	= null; /*Theme selecionado*/
+    private $rootView       = null; /*local root das views*/
+    private $defaultTheme   = null; /*Theme selecionado*/
     private $blockTheme     = null; /*bloco a ser utilizado do theme*/
     private $viewTheme      = null; /*bloco no theme onde sera montado a view*/
     private $indexTheme     = null; /*arquivo index do theme*/
-	private $rootTheme 		= null; /*Caminho root dos themes*/
+    private $rootTheme      = null; /*Caminho root dos themes*/
+    private $structure      = null;
     
     public function __construct() {
-        $this->config = new Config();
-    }
-	
-	function getConfig() {
-        return $this->config;
-    }
-	function setConfig($config) {
-        $this->config = $config;
+        $this->config   = new CW_Config();
+        $this->structure = new CW_Structure();
     }
     
     function getHtml() {
         return $this->html;
     }
-	function setHtml($html) {
+    function setHtml($html) {
         $this->html = $html;
     }
 
     function getExtensions() {
         return $this->extensions;
     }
-	function setExtensions($extensions) {
+    function setExtensions($extensions) {
         $this->extensions = $extensions;
     }
 
     function getView() {
-        return ($this->view)? $this->view : $this->config->getIndexViews();
+        return ($this->view)? $this->view : $this->structure->getView('index');
     }
-	function setView($view) {
+    function setView($view) {
         $this->view = $view;
     }
 
     function getBlockView() {
-        return isset($this->blockView)? $this->blockView : $this->config->getBlockViews();
+        return isset($this->blockView)? $this->blockView : $this->structure->getView('block');
     }
 	function setBlockView($blockView) {
         $this->blockView = $blockView;
     }
 	
-	function getRootView() {
-        return isset($this->rootView)? $this->rootView : $this->config->getRootViews();
+    function getRootView() {
+        $v = isset($this->rootView)? $this->rootView : $this->structure->getView('local');
+        return CW_Util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $v;
     }
-	function setRootView($rootView) {
-		$getLocalRoot = $this->config->getLocalRoot();
-        $this->rootView = CW_util::documentRoot() . '/' . isset($getLocalRoot)? $getLocalRoot . '/' : '' . $rootView;
+    function setRootView($rootView) {
+        $getLocalRoot = $this->config->getLocalRoot();
+        $this->rootView = CW_util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $rootView;
     }
 
     function getTheme() {
@@ -70,7 +65,7 @@ class CW_View {
     }
 	
 	function getDefaultTheme() {
-        return isset($this->defaultTheme)? $this->defaultTheme : $this->config->getDefaultThemes();
+        return isset($this->defaultTheme)? $this->defaultTheme : $this->structure->getTheme('default');
     }
 	function setDefaultTheme($theme) {
         $this->defaultTheme = $theme;
@@ -84,21 +79,22 @@ class CW_View {
     }
 
     function getViewTheme() {
-        return isset($this->viewTheme)? $this->viewTheme : $this->config->getViewThemes();
+        return isset($this->viewTheme)? $this->viewTheme : $this->structure->getTheme('view');
     }
 	function setViewTheme($viewTheme) {
         $this->viewTheme = $viewTheme;
     }
 
     function getIndexTheme() {
-        return isset($this->indexTheme)? $this->indexTheme : $this->config->getIndexThemes();
+        return isset($this->indexTheme)? $this->indexTheme : $this->structure->getTheme('index');
     }
     function setIndexTheme($indexTheme) {
         $this->indexTheme = $indexTheme;
     }
 	
-	function getRootTheme() {
-        return isset($this->rootTheme)? $this->rootTheme : $this->config->getRootThemes();
+    function getRootTheme() {
+        $t = isset($this->rootTheme)? $this->rootTheme : $this->structure->getTheme('local');
+        return CW_Util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $t;
     }
     function setRootTheme($rootTheme) {
         $this->rootTheme = $rootTheme;
@@ -182,27 +178,26 @@ class CW_View {
     
     public function urlRefactoring($_finds = null) {
         $finds = isset($_finds)? $_finds : array('link'=>'href','a'=>'href','script'=>'src','img'=>'src');
-        if($this->config->getUrlRefactoring()){
+        if($this->config->getUrlRefactoring() AND $this->html){
             foreach($finds as $k => $v){
-				foreach ($this->html->find($k) as $element) {
-					if (!strstr($element->$v, 'http')) {
-						$element->$v = $this->config->getServerThemes() . $this->config->getDefaultThemes() . '/' . $element->$v;
-					}
-				}
+                foreach ($this->html->find($k) as $element) {
+                        if (!strstr($element->$v, 'http')) {
+                                $element->$v = CW_Util::serverName(true) . '/' . CW_Util::localRoot() . '/' . $this->structure->getTheme('local') . '/' . $this->structure->getTheme('default') . '/' . $element->$v;
+                        }
+                }
             }
         }
-        return $this;
+        //return $this;
     }
     
     private function urlViewRoot($_view = null, $view_root_exist = null){
-        $view      = isset($_view) ? $_view : $this->getView();
-        $view_root = $this->getRootView() . $view;
+        $v = isset($_view) ? $_view : $this->getView();
+        $view_root = $this->getRootView() . '/' . $v;
         foreach($this->extensions as $ext){
             if(file_exists($view_root . $ext)){
                 $view_root_exist = $view_root . $ext;
             }
         }
-
         return $view_root_exist;
     }    
     
@@ -210,47 +205,41 @@ class CW_View {
 	Monta a url do theme.
 	Procura pelo arquivo existente
 	*/
-    private function urlThemeRoot($_theme = null, $_index_theme = null, $t_root_exist = null){
-        $extensions     = array('.php', '.html');
+    private function urlThemeRoot($_theme = null, $_index_theme = null, $theme_root_exist = null){
         $t              = isset($_theme) ? $_theme : $this->getDefaultTheme(); 
         $d              = isset($_index_theme) ? $_index_theme : $this->getIndexThemes(); 
-        $t_root         = $this->getRootTheme() . $t . '/' . $d;
-        foreach($extensions as $ext){
+        $t_root         = $this->getRootTheme() . '/' . $t . '/' . $d;
+        foreach($this->extensions as $ext){
             if(file_exists($t_root . $ext)){
-                $t_root_exist = $t_root . $ext;
+                $theme_root_exist = $t_root . $ext;
             }
         }
-        return $t_root_exist;
+        return $theme_root_exist;
     }
     
     private function html($_view = null){
-        $view           = is_array($_view)? $_view['view'] 						: $_view;
-        $block_view     = isset($_view['block_view'])? $_view['block_view'] 	: $this->getBlockView();
-        $theme          = isset($_view['theme'])? $_view['theme'] 				: $this->getTheme();
-        $block_theme    = isset($_view['block_theme'])? $_view['block_theme'] 	: $this->getBlockTheme();  
-        $view_theme     = isset($_view['view_theme'])? $_view['view_theme'] 	: $this->getViewTheme(); 
-        $index_theme    = isset($_view['index_theme'])? $_view['index_theme'] 	: $this->getIndexTheme();        
-        /*Busca a view */
-		$url_view = $this->urlViewRoot($view);
-		if(empty($url_view)){
-			$url_view = $this->urlViewRoot(null);
-		}
-        $_htmlView      = file_get_html($url_view);
-        /*Busca o bloco html da view */
-        $this->html     = $htmlView = isset($block_view)? $_htmlView->find($block_view, 0): $_htmlView;
-        /*Busca a url do theme se existir*/
-        $url_theme      = $this->urlThemeRoot($theme, $index_theme);		
-        $htmlTheme = isset($url_theme)? file_get_html($url_theme) : null; 
-        if($htmlTheme){
-            /*Busca o bloco do theme se existir*/
-            $this->html = isset($block_theme)? $htmlTheme->find($block_theme, 0) : $htmlTheme;
-        }
-        /*monta a view no theme */
-        if($view_theme and $htmlTheme){
-            foreach ($this->html->find($view_theme) as $element){
-                $element->innertext = $htmlView;            
+        $url_view = $this->urlViewRoot(is_array($_view)? $_view['view'] : $_view);
+        if($url_view){ 
+            $htmlView = file_get_html($url_view);
+            if($this->getBlockView()){
+                $htmlView->find($this->getBlockView(), 0);
             }
         }
+        $url_theme = $this->urlThemeRoot($this->getTheme(), $this->getIndexTheme());
+        if($url_theme){
+            $this->html = file_get_html($url_theme);
+            if($this->getBlockTheme()){
+                $this->html->find($this->getBlockTheme(), 0);
+            }
+        }
+        if($this->getViewTheme() AND $this->html){
+            foreach ($this->html->find($this->getViewTheme()) as $element){
+                $element->innertext = $htmlView;            
+            }
+        }else{
+            $this->html = $htmlView;
+        }
+        
     }
             
     public function view($_view = null) {

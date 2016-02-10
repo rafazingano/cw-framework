@@ -7,8 +7,8 @@ class CW_Controller {
 
     public function __construct() {        
         $this->view = new CW_View();
-        $this->config = new Config();
-        $this->view->setInnerText('config', $this->config->getInner());
+        //$this->config = new Config();
+        //$this->view->setInnerText('config', $this->config->getInner());
     }
 
     public function Model($model) {
