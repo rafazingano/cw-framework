@@ -33,6 +33,11 @@ class CW_Route {
         if(array_key_exists(CW_Util::requestUri(), $this->routes)){
             $this->controller = $this->routes[CW_Util::requestUri()]['controller'];
             $this->action = $this->routes[CW_Util::requestUri()]['action'];
-        }       
-    }  
+        }else{
+            $url_exp = explode('?', CW_Util::requestUri());
+            $url_expl = explode('/', $url_exp[0]);
+            if(isset($url_expl[0]) and !empty($url_expl[0])){ $this->controller = $url_expl[0]; }
+            if(isset($url_expl[1]) and !empty($url_expl[1])){ $this->action = $url_expl[1]; }
+        }
+    } 
 }

@@ -2,10 +2,6 @@
 
 class CW_Util {
     
-    public static function localRoot(){
-        RETURN substr(substr(str_replace(array('index.php', $_SERVER['DOCUMENT_ROOT']), '', $_SERVER['SCRIPT_FILENAME']), 1), 0, -1);
-    }
-    
     public static function serverName($http = FALSE){
         $SN = $_SERVER['HTTP_HOST'];
         $R = str_replace('www.', '', $SN);
@@ -17,11 +13,12 @@ class CW_Util {
         RETURN $_SERVER['DOCUMENT_ROOT'];
     }
     
-    public static function requestUri(){
-        RETURN str_replace(CW_Util::localRoot(), '', $_SERVER['REQUEST_URI']);
+    public static function path(){
+        RETURN str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', getcwd())) . '/';
     }
 
-    
-    
-    
+    public static function requestUri(){
+        RETURN str_replace(CW_Util::path(), '', $_SERVER['REQUEST_URI']);
+    }
+
 }

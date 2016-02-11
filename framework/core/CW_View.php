@@ -59,12 +59,12 @@ class CW_View {
     }
 	
     function getRootView() {
-        $v = isset($this->rootView)? $this->rootView : $this->structure->getView('local');
-        return CW_Util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $v;
+        $v = isset($this->rootView)? $this->rootView : $this->structure->getView('path');
+        return CW_Util::documentRoot() . CW_Util::path() . $v;
     }
     function setRootView($rootView) {
         $getLocalRoot = $this->config->getLocalRoot();
-        $this->rootView = CW_util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $rootView;
+        $this->rootView = CW_util::documentRoot() . CW_Util::path() . $rootView;
     }
 
     function getTheme() {
@@ -103,8 +103,8 @@ class CW_View {
     }
 	
     function getRootTheme() {
-        $t = isset($this->rootTheme)? $this->rootTheme : $this->structure->getTheme('local');
-        return CW_Util::documentRoot() . '/' . CW_Util::localRoot() . '/' . $t;
+        $t = isset($this->rootTheme)? $this->rootTheme : $this->structure->getTheme('path');
+        return CW_Util::documentRoot() . CW_Util::path() . $t;
     }
     function setRootTheme($rootTheme) {
         $this->rootTheme = $rootTheme;
@@ -191,9 +191,9 @@ class CW_View {
         if($this->config->getUrlRefactoring() AND $this->html){
             foreach($finds as $k => $v){
                 foreach ($this->html->find($k) as $element) {
-                        if (!strstr($element->$v, 'http')) {
-                                $element->$v = CW_Util::serverName(true) . '/' . CW_Util::localRoot() . '/' . $this->structure->getTheme('local') . '/' . $this->structure->getTheme('default') . '/' . $element->$v;
-                        }
+                    if (!strstr($element->$v, 'http')) {
+                        $element->$v = CW_Util::serverName(true) . CW_Util::path() . $this->structure->getTheme('path') . '/' . $this->structure->getTheme('default') . '/' . $element->$v;
+                    }
                 }
             }
         }

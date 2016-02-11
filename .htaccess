@@ -1,3 +1,9 @@
+<files ~ "^.*\.([Hh][Tt][Aa])">
+    order allow,deny
+    deny from all
+    satisfy all
+</files>
+
 <Files *.html>
 SetOutputFilter DEFLATE
 </Files>
@@ -17,16 +23,11 @@ SetOutputFilter DEFLATE
 Options +FollowSymLinks
 RewriteEngine On
 
-RewriteRule ^$ index.php
+RewriteEngine On
 
-RewriteRule ^([a-zA-Z0-9-]+).html$ index.php?controller=$1&%{QUERY_STRING}
-RewriteRule ^([a-zA-Z0-9-]+)/$ index.php?controller=$1&%{QUERY_STRING}
-RewriteRule ^([a-zA-Z0-9-]+)$ index.php?controller=$1&%{QUERY_STRING}
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ ./index.php?/$1 [L,QSA]
+#RewriteRule ^(.*)$ index.php?/$1 [L]
 
-RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+).html$ index.php?controller=$1&view=$2&%{QUERY_STRING}
-RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)/$ index.php?controller=$1&view=$2&%{QUERY_STRING}
-RewriteRule ^([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)$ index.php?controller=$1&view=$2&%{QUERY_STRING}
-
-ErrorDocument 403 /index.php?controller=403
-ErrorDocument 404 /index.php?controller=404
-ErrorDocument 500 /index.php?controller=500
+AddDefaultCharset UTF-8
