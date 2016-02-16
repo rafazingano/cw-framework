@@ -54,7 +54,7 @@ class CW_View {
     function getBlockView() {
         return isset($this->blockView)? $this->blockView : $this->structure->getView('block');
     }
-	function setBlockView($blockView) {
+    function setBlockView($blockView) {
         $this->blockView = $blockView;
     }
 	
@@ -74,7 +74,7 @@ class CW_View {
         $this->setDefaultTheme($theme);
     }
 	
-	function getDefaultTheme() {
+    function getDefaultTheme() {
         return isset($this->defaultTheme)? $this->defaultTheme : $this->structure->getTheme('default');
     }
 	function setDefaultTheme($theme) {
@@ -82,16 +82,16 @@ class CW_View {
     }
 
     function getBlockTheme() {
-        return $this->blockTheme;
+        return isset($this->blockTheme)? $this->blockTheme : $this->structure->getTheme('block');
     }
-	function setBlockTheme($blockTheme) {
+    function setBlockTheme($blockTheme) {
         $this->blockTheme = $blockTheme;
     }
 
     function getViewTheme() {
         return isset($this->viewTheme)? $this->viewTheme : $this->structure->getTheme('view');
     }
-	function setViewTheme($viewTheme) {
+    function setViewTheme($viewTheme) {
         $this->viewTheme = $viewTheme;
     }
 
@@ -227,21 +227,11 @@ class CW_View {
         return $theme_root_exist;
     }
     
-    private function html($_view = null){
-        $url_view = $this->urlViewRoot(is_array($_view)? $_view['view'] : $_view);
-        if($url_view){ 
-            $htmlView = $this->file_get_html($url_view);
-            if($this->getBlockView()){
-                $htmlView->find($this->getBlockView(), 0);
-            }
-        }
+    private function html($_view = null){        
         $url_theme = $this->urlThemeRoot($this->getTheme(), $this->getIndexTheme());
-        if($url_theme){
-            $this->html = $this->file_get_html($url_theme);
-            if($this->getBlockTheme()){
-                $this->html->find($this->getBlockTheme(), 0);
-            }
-        }
+        if($url_theme){ $this->html = empty($this->getBlockTheme())? $this->file_get_html($url_theme) : $this->file_get_html($url_theme)->find($this->getBlockTheme(), 0); }
+        $url_view = $this->urlViewRoot(is_array($_view)? $_view['view'] : $_view);
+        if($url_view){ $htmlView = empty($this->getBlockView())? $this->file_get_html($url_view) : $this->file_get_html($url_view)->find($this->getBlockView(), 0); }
         if($this->getViewTheme() AND $this->html){
             foreach ($this->html->find($this->getViewTheme()) as $element){
                 $element->innertext = $htmlView;            
@@ -249,7 +239,6 @@ class CW_View {
         }else{
             $this->html = $htmlView;
         }
-        
     }
             
     public function view($_view = null) {
