@@ -43,7 +43,7 @@ class CW_Structure {
 
     function setController($controller, $p = null) {
         if(isset($p) AND !is_array($p)){
-            $this->controller[$p] = $view;
+            $this->controller[$p] = $p;
         }else{
             $this->controller = $controller;
         }
