@@ -7,7 +7,7 @@ return [
     ],
     'view' => [
         'path' => 'views',         /*Diretório das views*/
-        'index' => 'default/index', /*arquivo default view*/
+        'index' => 'index/index', /*arquivo default view*/
         'block' => null,            /*Caso não vá usar todo o views busca-se o bloco a ser utilizado.*/
     ],
     'theme' => [

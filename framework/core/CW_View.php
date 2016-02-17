@@ -16,8 +16,8 @@ class CW_View {
     private $structure      = null;
     
     public function __construct() {
-        $this->config   = new CW_Config();
-        $this->structure = new CW_Structure();
+        $this->config       = new CW_Config();
+        $this->structure    = new CW_Structure();
     }
     
     function file_get_html($url, $use_include_path = false, $context=null, $offset = -1, $maxLen=-1, $lowercase = true, $forceTagsClosed=true, $target_charset = 'UTF-8', $stripRN=true, $defaultBRText="\r\n", $defaultSpanText=" ") {
@@ -63,7 +63,6 @@ class CW_View {
         return CW_Util::documentRoot() . CW_Util::path() . $v;
     }
     function setRootView($rootView) {
-        $getLocalRoot = $this->config->getLocalRoot();
         $this->rootView = CW_util::documentRoot() . CW_Util::path() . $rootView;
     }
 
@@ -141,10 +140,10 @@ class CW_View {
         }
     }
     
-    private function innerText($html = null){
-        if($html and $this->getInnerText()){
+    private function innerText(){
+        if($this->html and $this->getInnerText()){
             foreach($this->getInnerText() as $key => $value){
-                $this->addInnerText($html, $key, $value);
+                $this->addInnerText($this->html, $key, $value);
             }
         }
     }
@@ -200,50 +199,50 @@ class CW_View {
         //return $this;
     }
     
-    private function urlViewRoot($_view = null, $view_root_exist = null){
-        $v = isset($_view) ? $_view : $this->getView();
-        $view_root = $this->getRootView() . '/' . $v;
+    /**
+     * Returns the view root URL that the file exists
+     * @return type
+     */
+    private function urlViewRoot(){
+        $view_root = $this->getRootView() . '/' . $this->getView();
         foreach($this->extensions as $ext){
-            if(file_exists($view_root . $ext)){
-                $view_root_exist = $view_root . $ext;
-            }
+            if(file_exists($view_root . $ext)){ $view_root_exist = $view_root . $ext; break; }
         }
-        return $view_root_exist;
+        return isset($view_root_exist)? $view_root_exist : NULL;
     }    
     
-	/*
-	Monta a url do theme.
-	Procura pelo arquivo existente
-	*/
-    private function urlThemeRoot($_theme = null, $_index_theme = null, $theme_root_exist = null){
-        $t              = isset($_theme) ? $_theme : $this->getDefaultTheme(); 
-        $d              = isset($_index_theme) ? $_index_theme : $this->getIndexThemes(); 
-        $t_root         = $this->getRootTheme() . '/' . $t . '/' . $d;
+    /**
+     * Returns the theme root URL that the file exists
+     * @return type
+     */
+    private function urlThemeRoot(){ 
+        $t_root = $this->getRootTheme() . '/' . $this->getDefaultTheme() . '/' . $this->getIndexTheme();
         foreach($this->extensions as $ext){
-            if(file_exists($t_root . $ext)){
-                $theme_root_exist = $t_root . $ext;
-            }
+            if(file_exists($t_root . $ext)){ $theme_root_exist = $t_root . $ext; break; }
         }
-        return $theme_root_exist;
+        return isset($theme_root_exist)? $theme_root_exist : NULL;
     }
     
-    private function html($_view = null){        
-        $url_theme = $this->urlThemeRoot($this->getTheme(), $this->getIndexTheme());
+    /**
+     * Mount the HTML uniting theme and view it there
+     */
+    private function html(){     
+        $url_theme = $this->urlThemeRoot();
         if($url_theme){ $this->html = empty($this->getBlockTheme())? $this->file_get_html($url_theme) : $this->file_get_html($url_theme)->find($this->getBlockTheme(), 0); }
-        $url_view = $this->urlViewRoot(is_array($_view)? $_view['view'] : $_view);
+        $url_view = $this->urlViewRoot();
         if($url_view){ $htmlView = empty($this->getBlockView())? $this->file_get_html($url_view) : $this->file_get_html($url_view)->find($this->getBlockView(), 0); }
-        if($this->getViewTheme() AND $this->html){
+        if($this->getViewTheme() AND $this->html AND isset($htmlView)){
             foreach ($this->html->find($this->getViewTheme()) as $element){
                 $element->innertext = $htmlView;            
             }
-        }else{
+        }else if(isset($htmlView)){
             $this->html = $htmlView;
         }
     }
             
     public function view($_view = null) {
-        $this->html($_view);
-        $this->innerText($this->html);
+        $this->html();
+        $this->innerText();
         $this->urlRefactoring();
         echo $this->html;
     }
