@@ -2,7 +2,7 @@
 
 class CW_Controller {
 
-    protected $view     = null;
+    protected $view = null;
 
     public function __construct() {        
         $this->view = new CW_View();

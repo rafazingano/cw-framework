@@ -33,11 +33,11 @@ class CW_Structure {
         }
     }
 
-    function setTheme($theme, $p = null) {
-        if(isset($p) AND !is_array($p)){
-            $this->theme[$p] = $view;
+    function setTheme($t, $theme = null) {
+        if(isset($t) AND !is_array($t)){
+            $this->theme[$t] = $theme;
         }else{
-            $this->theme = $theme;
+            $this->theme = $t;
         }
     }
 

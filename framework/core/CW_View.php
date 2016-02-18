@@ -12,6 +12,7 @@ class CW_View {
     private $blockTheme     = null; /*bloco a ser utilizado do theme*/
     private $viewTheme      = null; /*bloco no theme onde sera montado a view*/
     private $indexTheme     = null; /*arquivo index do theme*/
+    private $pathTheme      = null; /*Caminho dos themes*/
     private $rootTheme      = null; /*Caminho root dos themes*/
     private $structure      = null;
     
@@ -69,14 +70,14 @@ class CW_View {
     function getTheme() {
         return $this->getDefaultTheme();
     }
-	function setTheme($theme) {
+    function setTheme($theme) {
         $this->setDefaultTheme($theme);
     }
 	
     function getDefaultTheme() {
         return isset($this->defaultTheme)? $this->defaultTheme : $this->structure->getTheme('default');
     }
-	function setDefaultTheme($theme) {
+    function setDefaultTheme($theme) {
         $this->defaultTheme = $theme;
     }
 
@@ -99,6 +100,13 @@ class CW_View {
     }
     function setIndexTheme($indexTheme) {
         $this->indexTheme = $indexTheme;
+    }
+    
+    function getPathTheme() {
+        return isset($this->pathTheme)? $this->pathTheme : $this->structure->getTheme('path');
+    }
+    function setPathTheme($rootTheme) {
+        $this->pathTheme = $rootTheme;
     }
 	
     function getRootTheme() {
@@ -191,7 +199,7 @@ class CW_View {
             foreach($finds as $k => $v){
                 foreach ($this->html->find($k) as $element) {
                     if (!strstr($element->$v, 'http')) {
-                        $element->$v = CW_Util::serverName(true) . CW_Util::path() . $this->structure->getTheme('path') . '/' . $this->structure->getTheme('default') . '/' . $element->$v;
+                        $element->$v = CW_Util::serverName(true) . CW_Util::path() . $this->getPathTheme() . '/' . $this->getDefaultTheme() . '/' . str_replace(array('../'), '', $element->$v);
                     }
                 }
             }
