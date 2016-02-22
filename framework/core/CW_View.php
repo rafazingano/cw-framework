@@ -6,14 +6,7 @@ class CW_View {
     private $config         = null; /*arquivo de configuração*/
     private $extensions     = array('.php', '.html'); /*Extenções que ira buscar para montar views e themes*/
     private $view           = null; /*view selecionada*/
-    private $blockView      = null; /*bloco a ser utilizado da view*/
-    private $rootView       = null; /*local root das views*/
-    private $defaultTheme   = null; /*Theme selecionado*/
-    private $blockTheme     = null; /*bloco a ser utilizado do theme*/
-    private $viewTheme      = null; /*bloco no theme onde sera montado a view*/
-    private $indexTheme     = null; /*arquivo index do theme*/
-    private $pathTheme      = null; /*Caminho dos themes*/
-    private $rootTheme      = null; /*Caminho root dos themes*/
+    private $theme          = null; /*Theme*/
     private $structure      = null;
     
     public function __construct() {
@@ -44,14 +37,29 @@ class CW_View {
     function setExtensions($extensions) {
         $this->extensions = $extensions;
     }
-
-    function getView() {
-        return ($this->view)? $this->view : $this->structure->getView('index');
+    
+    function getView($view, $v = 'index') {
+        return ($this->view[$v])? $this->view[$v] : $this->structure->getView($v);
     }
-    function setView($view) {
-        $this->view = $view;
+    function setView($view, $v = 'index') {
+        if(isset($v) AND !is_array($v)){
+            $this->theme[$v] = $view;
+        }else{
+            $this->theme = $view;
+        }
     }
-
+    function getTheme($p = null) {
+        return isset($p)? $this->theme[$p] : $this->structure->getTheme($p);
+    }
+    
+    function setTheme($t, $theme = null) {
+        if(isset($t) AND !is_array($t)){
+            $this->theme[$t] = $theme;
+        }else{
+            $this->theme = $t;
+        }
+    }
+    /*
     function getBlockView() {
         return isset($this->blockView)? $this->blockView : $this->structure->getView('block');
     }
@@ -116,6 +124,7 @@ class CW_View {
     function setRootTheme($rootTheme) {
         $this->rootTheme = $rootTheme;
     }
+    */
     
     public function setInnerText($k, $v) {
         $this->innerText[$k] = $v;
@@ -224,7 +233,7 @@ class CW_View {
      * @return type
      */
     private function urlThemeRoot(){ 
-        $t_root = $this->getRootTheme() . '/' . $this->getDefaultTheme() . '/' . $this->getIndexTheme();
+        $t_root = $this->getTheme('root') . '/' . $this->getTheme('active') . '/' . $this->getTheme('view');
         foreach($this->extensions as $ext){
             if(file_exists($t_root . $ext)){ $theme_root_exist = $t_root . $ext; break; }
         }
