@@ -13,6 +13,15 @@ class CW_Util {
         RETURN $_SERVER['DOCUMENT_ROOT'];
     }
     
+    /**
+     * Retorna o caminho root completi incluindo subdiretorios se existirem
+     * @return type
+     */
+    public static function getCWD(){
+        return str_replace('\\', '/', getcwd()) . '/';
+    }
+
+
     public static function path(){
         RETURN str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', getcwd())) . '/';
     }
