@@ -1,6 +1,9 @@
 <?php
 
-class DocumentationController extends CW_Controller {
+namespace controllers;
+use framework\core\Controller;
+
+class DocumentationController extends Controller {
 
     public function index() {
    

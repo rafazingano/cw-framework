@@ -1,10 +1,13 @@
 <?php
 
-class IndexController extends CW_Controller {
+namespace controllers;
+use framework\core\Controller;
+
+class IndexController extends Controller {
 
     public function index() {
 
-        $this->view->view('index/index');
+        $this->view->render('index/index');
        
     }
 

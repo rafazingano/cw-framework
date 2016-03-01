@@ -1,9 +1,9 @@
 <?php
 return [
-    'driver' => 'mysql',
-    'host' => 'localhost',
-    'port' => '3306',
-    'dbname' => 'dbname',
-    'username' => 'user',
-    'password' => 'secret'
+    'driver'    => 'mysql',
+    'host'      => 'localhost',
+    'port'      => '3306',
+    'dbname'    => 'dbname',
+    'username'  => 'user',
+    'password'  => 'secret'
 ];

@@ -4,13 +4,14 @@ namespace framework\core;
 
 class View {
     private $html           = null; /*html geral*/
-    private $innerText      = null; /*vai armazenar todos os valores que serao utilizados no html*/
+    private $element        = null; /**/
     private $config         = null; /*arquivo de configuração*/
     private $extensions     = array('.php', '.html'); /*Extenções que ira buscar para montar views e themes*/
     private $view           = null; /*view selecionada*/
-    public $theme          = null; /*Theme*/
+    public $theme           = null; /*Theme*/
     private $structure      = null;
     private $dom            = null;
+    private $urlRefacAttr   = array('link'=>'href','a'=>'href','script'=>'src','img'=>'src');
     
     public function __construct() {
         $this->config       = new Config();
@@ -19,18 +20,31 @@ class View {
         $this->dom          = new Dom();
     }
     
+    /**
+     * Busca o html montado
+     * @return type
+     */
     function getHtml() {
         return $this->html;
     }
     
+    /**
+     * Seta um html para o projeto
+     * @param type $html
+     */
     function setHtml($html) {
         $this->html = $html;
     }
-
+    
+    /**
+     * Busca as extenções que serao avaliadas em themes e views
+     * @return type
+     */
     function getExtensions() {
         return $this->extensions;
     }
     
+    /*Seta extenções para serem avaliadas em themes e views */
     function setExtensions($extensions) {
         $this->extensions = $extensions;
     }
@@ -83,101 +97,61 @@ class View {
         }
     }
     
-    public function setInnerText($k, $v) {
-        $this->innerText[$k] = $v;
-    }
-    public function getInnerText($k = null) {
-        if ($k === null) {
-            return $this->innerText ;
-        } else {
-            if (isset($this->innerText[$k]) && ($this->innerText[$k] != null ) && ($this->innerText[$k] != '' )) {
-                return $this->innerText[$k];
-            } else {
-                return null;
-            }
-        }
-    }
-    
-    private function attributes($html = null, $value = null){
-        foreach($value as $k => $v){
-            foreach($v as $attr_k => $attr_v){
-                $this->addAttributes($html, $k, $attr_v, $attr_k);
-            }
-        }
-    }
-    
-    private function addAttributes($html = null, $key = null, $value = null, $attribute = 'innertext'){        
-        if (method_exists($html,"find")){   
-            foreach ($html->find($key) as $element){
-                $element->$attribute = $value;            
-            }
-        }
-    }
-    
-    private function innerText(){
-        if($this->html and $this->getInnerText()){
-            foreach($this->getInnerText() as $key => $value){
-                $this->addInnerText($this->html, $key, $value);
-            }
-        }
-    }
-    
-    private function addInnerTextBlock($html = null, $val = null){
-        foreach($val as $content_v){
-            $attributes = isset($content_v['attributes'])? $content_v['attributes'] : null;                       
-            foreach ($html->find($content_v['parent'] . ' ' . $content_v['child']) as $e){
-                $block = str_get_html($e->outertext);
-                if($attributes){ $this->attributes($block, $attributes); }
-                foreach($content_v['content'] as $child_k => $child_v){
-                    foreach($child_v as $c_k => $c_v){ 
-                        foreach ($block->find($c_k) as $child_element){
-                                $child_element->innertext = !is_array($c_v)? $c_v : $c_v['content']; 
-                                if(isset($c_v['attributes'])){ $this->attributes($block, array($c_k => $c_v['attributes'])); }
-                            $v[$content_v['parent']] = isset($v[$content_v['parent']])? $v[$content_v['parent']] : null . $block;                                       
-                        } 
-                    } 
-                }
-            }
-        }
-        return isset($v)? $v : null;
-    }
-    
-    private function addInnerText($html = null, $key = null, $value = null, $attribute = 'innertext'){
-        if(!is_array($value)){
-            $this->addAttributes($html, $key, $value, $attribute);
-        }else if($key === 'attributes'){
-            $this->attributes($html, $value);               
-        }else{
-            foreach($value as $k => $v){
-                $k = empty($k)? $key : $k; 
-                if($k === 'block'){                  
-                    $v = $this->addInnerTextBlock($html, $v);
-                    $k = rand();
-                }
-                $this->addInnerText($html, $k, $v, $attribute);
-            }
-        }
-    }
-    
-    public function urlRefactoring($_finds = null) {
-        $finds = isset($_finds)? $_finds : array('link'=>'href','a'=>'href','script'=>'src','img'=>'src');
-        if($this->config->getUrlRefactoring() AND $this->html){
-            foreach($finds as $k => $v){
-                foreach ($this->html->find($k) as $element) {
-                    if (!strstr($element->$v, 'http')) {
-                        $element->$v = $this->theme->getTheme('server') . str_replace(array('../'), '', $element->$v);
-                    }
-                }
-            }
-        }
-    }    
-
     /**
-     * Retorna o html dom da view para ser trabalhado
+     * Seta os elementos a serem acrescentados no html
+     * @param type $k
+     * @param type $v
+     * @param type $attribute
+     */
+    public function setElement($k = null, $v = null, $attribute = 'innertext'){
+        $this->element[$attribute][$k] = $v;
+    }
+    
+    /**os elementos a serem acrescentados no html
+     * retorna 
+     * @param type $k
+     * @param type $attribute
      * @return type
      */
-    public function viewHtml(){
-        $url_view = $this->getView('root_file');
+    public function getElement($k = null, $attribute = 'innertext') {
+        return (isset($this->element[$attribute][$k]) and $k !== null)? $this->element[$attribute][$k] : $this->element;
+    }
+    
+    /**
+     * monta o html do theme
+     * @param type $t
+     * @return \framework\core\View
+     */
+    public function theme($t = null){
+        $this->html = $this->theme->html($t); 
+        return $this;
+    }
+    
+    /**
+     * Monta o html da view 
+     * @param type $html
+     * @param type $value
+     */
+    public function view($v = null){
+        if($this->html){
+            $this->setElement($this->theme->getTheme('view'), $this->html($v));
+        }else{
+            $this->html = $this->html($v);
+        }
+        return $this;
+    }
+    
+    /**
+     * Monta o html da view
+     * @param type $v
+     * @return type
+     */
+    public function html($v = null){
+        if(isset($v) and !is_array($v)){ $this->setView('theme', $v); }
+        if(isset($v['path'])){  $this->setView('path', $v['path']); }
+        if(isset($v['file'])){  $this->setView('file', $v['file']); }
+        if(isset($v['block'])){ $this->setView('block', $v['block']); }
+        $url_view = $this->getView('root_file');        
         if($url_view){
             return empty($this->getView('block'))? $this->dom->file_get_html($url_view) : $this->dom->file_get_html($url_view)->find($this->getView('block'), 0); 
         }else{
@@ -186,43 +160,61 @@ class View {
     }
     
     /**
-     * retorna o html dom do theme
-     * @return type
+     * Monta os setTexts
+     * @return \framework\core\View
      */
-    public function themeHtml(){
-        $url_theme = $this->theme->getTheme('root_file');
-        if($url_theme){
-            return empty($this->theme->getTheme('block'))? $this->dom->file_get_html($url_theme) : $this->dom->file_get_html($url_theme)->find($this->theme->getTheme('block'), 0); 
-        }else{
-            return null;
+    public function addText(){
+        $elements = $this->getElement();
+        if($elements){
+            foreach($elements as $attr => $phtml){
+                foreach($phtml as $key => $value){
+                    $this->addHtmlText($this->html, $key, $value, $attr);
+                }
+            }
         }
+        return $this;
     }
     
     /**
-     * Mount the HTML uniting theme and view it there
+     * Adiciona texto e blocos de html ao html
+     * @param type $html
+     * @param type $key
+     * @param type $value
+     * @param type $attribute
      */
-    private function html(){
-        $htmlView = $this->viewHtml();
-        $this->html = $this->themeHtml();        
-        if(isset($this->html) AND isset($htmlView) AND $this->theme->getTheme('view')){
-            foreach ($this->html->find($this->theme->getTheme('view')) as $element){
-                $element->innertext = $htmlView;            
+    private function addHtmlText($html = null, $key = null, $value = null, $attribute = 'innertext'){
+        foreach ($html->find($key) as $element){
+            $element->$attribute = $value;            
+        }             
+    }
+    
+    /**
+     * Refatora as urls de todo o html
+     * @param type $html
+     * @param type $value
+     */
+    public function urlRefactoring($ura = null) {
+        if($ura === FALSE){ $this->config->setUrlRefactoring(FALSE); }
+        if($this->config->getUrlRefactoring() AND $this->html){
+            foreach($this->urlRefacAttr as $k => $v){
+                foreach ($this->html->find($k) as $element) {
+                    if (!strstr($element->$v, 'http')) {
+                        $element->$v = $this->theme->getTheme('server') . str_replace(array('../'), '', $element->$v);
+                    }
+                }
             }
         }
-        if(!isset($this->html) and isset($htmlView)){
-            $this->html = $htmlView;
-        }
+        return $this;
     }
-            
-    public function view($_view = null) {
-        //if($_view){
-        //    $_view = is_array($_view)? $_view : array('view' => array('file' => $_view));
-        //    $this->setView($_view['view']);
-        //    if(isset($_view['theme'])){ $this->theme->setTheme($_view['theme']); }
-        //}
-        $this->html();
-        $this->innerText();
-        $this->urlRefactoring();
+    
+    /**
+     * Renderiza o html
+     * @param type $_view
+     */
+    public function render($_view = null) {
+        if(!isset($this->html)){
+            $this->theme()->view()->addText()->urlRefactoring();
+        }
         echo $this->html;
     }
 

@@ -8,6 +8,7 @@ class Theme {
     
     function __construct() {
         $this->structure    = new Structure();
+        $this->dom          = new Dom();
     }
     
     /**
@@ -88,5 +89,24 @@ class Theme {
      */
     function setExtensions($extensions) {
         $this->extensions = $extensions;
+    }
+    
+    /**
+     * retorna o html dom do theme
+     * @return type
+     */
+    public function html($t = null){
+        if(isset($t) and !is_array($t)){ $this->setTheme('theme', $t); }
+        if(isset($t['path'])){  $this->setTheme('path', $t['path']); }
+        if(isset($t['theme'])){ $this->setTheme('theme', $t['theme']); }
+        if(isset($t['file'])){  $this->setTheme('file', $t['file']); }
+        if(isset($t['view'])){  $this->setTheme('view', $t['view']); }
+        if(isset($t['block'])){ $this->setTheme('block', $t['block']); }
+        $url_theme = $this->getTheme('root_file');
+        if($url_theme){
+            return empty($this->getTheme('block'))? $this->dom->file_get_html($url_theme) : $this->dom->file_get_html($url_theme)->find($this->getTheme('block'), 0); 
+        }else{
+            return null;
+        }
     }
 }

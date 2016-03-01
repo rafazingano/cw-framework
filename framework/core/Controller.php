@@ -11,13 +11,6 @@ class Controller {
     }
 
     public function model($model) {
-        /*
-        if (file_exists("models/{$model}.php")) {
-            include_once "models/{$model}.php";
-        } else {
-            die("Modelo {$model} não encontrado na pasta modelos.");
-        }
-        */
         $this->$model = new $model();
     }
 
