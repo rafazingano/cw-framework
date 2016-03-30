@@ -104,7 +104,7 @@ class Theme {
         if(isset($t['block'])){ $this->setTheme('block', $t['block']); }
         $url_theme = $this->getTheme('root_file');
         if($url_theme){
-            return empty($this->getTheme('block'))? $this->dom->file_get_html($url_theme) : $this->dom->file_get_html($url_theme)->find($this->getTheme('block'), 0); 
+            empty($this->getTheme('block'))? $this->dom->file_get_html($url_theme) : $this->dom->file_get_html($url_theme)->find($this->getTheme('block'), 0); 
         }else{
             return null;
         }
