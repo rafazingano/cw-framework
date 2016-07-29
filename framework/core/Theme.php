@@ -63,11 +63,16 @@ class Theme {
     }
     
     /**
-     * Seta valores de estrutura para os themes
+     * Seta valores de estrutura para os themes.
+     * path: Diretório onde ficaram o(s) theme(s).
+     * theme: Diretorio do thema.
+     * file: Arquivo index do theme.
+     * view: Bloco onde vai ser inserido a view. Ex: div[class="view"].
+     * block: Caso não vá usar todo o theme busca-se o bloco a ser utilizado.
      * @param type $theme
      * @param type $t
      */
-    function setTheme($theme = null, $t = null) {
+    public function setTheme($theme = null, $t = null) {
         if(isset($theme) and isset($t) and !is_array($theme)){
             $this->theme[$theme] = $t;
         }else{
@@ -79,7 +84,7 @@ class Theme {
      * Busca extenções dos themes
      * @return type
      */
-    function getExtensions() {
+    public function getExtensions() {
         return $this->extensions;
     }
 
@@ -87,7 +92,7 @@ class Theme {
      * Setar extenções para verificar os themes
      * @return type
      */
-    function setExtensions($extensions) {
+    public function setExtensions($extensions) {
         $this->extensions = $extensions;
     }
     
@@ -105,6 +110,7 @@ class Theme {
         $url_theme = $this->getTheme('root_file');
         if($url_theme){
             empty($this->getTheme('block'))? $this->dom->file_get_html($url_theme) : $this->dom->file_get_html($url_theme)->find($this->getTheme('block'), 0); 
+            return $this->dom->getHtml();
         }else{
             return null;
         }

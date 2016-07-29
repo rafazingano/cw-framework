@@ -17,11 +17,11 @@ class Request {
 		$this->params 		= isset($url_explode[0])? $url_explode : null;
 	}
 	
-    public static function get($key) {        
-        if (isset($_REQUEST[$key]) && ($_REQUEST[$key] != '')) {
-            return $_REQUEST[$key];
+    public static function get($key = null) {        
+        if (isset($key) && ($key != '')) {
+            return isset($_REQUEST[$key])? $_REQUEST[$key] : null;
         }  else {
-            return null;
+            return isset($_REQUEST)? $_REQUEST : null;
         }        
     }
 

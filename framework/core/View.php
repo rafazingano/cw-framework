@@ -183,9 +183,12 @@ class View{
      * Renderiza o html
      * @param type $_view
      */
-    public function render($_view = null) {
+    public function render($_view = null) {        
         if(!isset($this->html)){
             $this->theme()->view()->urlRefactoring();
+        }
+        if(isset($_view)){
+            $this->view($_view)->urlRefactoring();
         }
         echo $this->html;
     }
